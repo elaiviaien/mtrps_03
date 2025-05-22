@@ -7,4 +7,9 @@ RUN go mod download
 COPY . .
 RUN go build -o fizzbuzz .
 
-ENTRYPOINT ["./fizzbuzz"]
+FROM scratch
+
+COPY --from=builder /app/fizzbuzz /fizzbuzz
+COPY --from=builder /app/templates /templates
+
+ENTRYPOINT ["/fizzbuzz"]
