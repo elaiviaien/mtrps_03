@@ -1,13 +1,18 @@
 # -----------------------------------------------------------------------------
 # BASE: system dependencies
 # -----------------------------------------------------------------------------
-FROM python:3.11-alpine AS base
+FROM python:3.11-slim AS base
 
 ENV POETRY_HOME=/opt/poetry \
     PATH="/opt/poetry/bin:$PATH"
 
-RUN apk update \
-    && apk add --no-cache curl git
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /app
 
@@ -34,7 +39,7 @@ RUN poetry config virtualenvs.in-project true \
 # -----------------------------------------------------------------------------
 # RUNTIME: minimal image + code + venv
 # -----------------------------------------------------------------------------
-FROM python:3.11-alpine AS runtime
+FROM python:3.11-slim AS runtime
 
 ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
