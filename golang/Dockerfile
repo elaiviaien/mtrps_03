@@ -1,15 +1,11 @@
-FROM golang:1.20-alpine AS builder
+FROM golang:1.20-alpine AS build
 
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-
 COPY . .
-RUN go build -o fizzbuzz .
+RUN go mod download && CGO_ENABLED=0 go build -o fizzbuzz .
 
-FROM scratch
-
-COPY --from=builder /app/fizzbuzz /fizzbuzz
-COPY --from=builder /app/templates /templates
+FROM gcr.io/distroless/base-debian11:debug
+COPY --from=build /app/fizzbuzz /fizzbuzz
+COPY --from=build /app/templates /templates
 
 ENTRYPOINT ["/fizzbuzz"]
