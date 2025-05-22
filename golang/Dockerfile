@@ -1,10 +1,10 @@
-FROM golang:1.20-alpine AS build
+FROM golang:1.20-alpine AS builder
 
 WORKDIR /app
-COPY . .
-RUN go mod download && go build -o server .
+COPY go.mod go.sum ./
+RUN go mod download
 
-FROM scratch
-COPY --from=build /app/server /server
-EXPOSE 8080
-ENTRYPOINT ["/server"]
+COPY . .
+RUN go build -o fizzbuzz .
+
+ENTRYPOINT ["./fizzbuzz"]
